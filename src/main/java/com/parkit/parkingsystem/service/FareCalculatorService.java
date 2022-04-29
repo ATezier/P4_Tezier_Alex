@@ -12,10 +12,6 @@ public class FareCalculatorService {
 
         long durationMinutes = (ticket.getOutTime().getTime() - ticket.getInTime().getTime()) / 60000;
 
-        //TODO: Some tests are failing here. Need to check if this logic is correct
-        System.out.println(ticket.getInTime()+" to "+ticket.getOutTime());
-        System.out.println("DurationMillis : "+durationMinutes);
-
         if(durationMinutes > 30){
             long durationHour=durationMinutes/60;
             durationMinutes%=60;
