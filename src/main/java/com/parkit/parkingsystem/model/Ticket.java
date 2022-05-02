@@ -62,9 +62,7 @@ public class Ticket {
     }
 
     public void truncatePrice(){
-        System.out.println("not truncated : "+price);
-        Double truncatedDouble = BigDecimal.valueOf(price).setScale(3, RoundingMode.HALF_UP).doubleValue();
+        Double truncatedDouble = BigDecimal.valueOf(price).setScale(2, RoundingMode.HALF_UP).doubleValue();
         price =truncatedDouble;
-        System.out.println("truncated : "+price);
     }
 }

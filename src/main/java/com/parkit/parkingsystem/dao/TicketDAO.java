@@ -111,7 +111,7 @@ public class TicketDAO {
         }
         return res;
     }
-    
+
     public boolean applyDiscount(Ticket ticket) {
         boolean res = this.checkDiscount(ticket.getVehicleRegNumber());
         if(res){
