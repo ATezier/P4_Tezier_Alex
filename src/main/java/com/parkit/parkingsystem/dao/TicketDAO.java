@@ -14,6 +14,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
 
+import static com.parkit.parkingsystem.constants.Fare.DISCOUNT;
 import static com.parkit.parkingsystem.constants.Fare.PREMIUM_CLIENT;
 
 public class TicketDAO {
@@ -74,16 +75,9 @@ public class TicketDAO {
 
     public boolean updateTicket(Ticket ticket) {
         Connection con = null;
-        ResultSet rs = null;
         try {
             con = dataBaseConfig.getConnection();
-            PreparedStatement ps = con.prepareStatement(DBConstants.CLIENT_OCCURENCY);
-            ps.setString(1, ticket.getVehicleRegNumber());
-            rs = ps.executeQuery();
-            rs.next();
-            if(rs.getInt(1) >= PREMIUM_CLIENT) ticket.setPrice( ticket.getPrice() * .95);
-
-            ps = con.prepareStatement(DBConstants.UPDATE_TICKET);
+            PreparedStatement ps = con.prepareStatement(DBConstants.UPDATE_TICKET);
             ps.setDouble(1, ticket.getPrice());
             ps.setTimestamp(2, new Timestamp(ticket.getOutTime().getTime()));
             ps.setInt(3,ticket.getId());
@@ -92,9 +86,55 @@ public class TicketDAO {
         }catch (Exception ex){
             logger.error("Error saving ticket info",ex);
         }finally {
-            dataBaseConfig.closeResultSet(rs);
             dataBaseConfig.closeConnection(con);
         }
         return false;
+    }
+
+    public boolean applyDiscount(Ticket ticket) {
+        Connection con = null;
+        ResultSet rs = null;
+        boolean res = false;
+        try {
+            con = dataBaseConfig.getConnection();
+            PreparedStatement ps = con.prepareStatement(DBConstants.CLIENT_OCCURENCY);
+            ps.setString(1, ticket.getVehicleRegNumber());
+            rs = ps.executeQuery();
+            rs.next();
+            if(rs.getInt(1) >= PREMIUM_CLIENT){
+                double price=ticket.getPrice();
+                price*=DISCOUNT;
+                ticket.setPrice(price);
+                res=true;
+            }
+            return res;
+        }catch (Exception ex){
+            logger.error("Error saving ticket info",ex);
+        }finally {
+            dataBaseConfig.closeResultSet(rs);
+            dataBaseConfig.closeConnection(con);
+        }
+        return res;
+    }
+
+    public boolean checkDiscount(String vehicleRegNumber) {
+        Connection con = null;
+        ResultSet rs = null;
+        boolean res=false;
+        try {
+            con = dataBaseConfig.getConnection();
+            PreparedStatement ps = con.prepareStatement(DBConstants.CLIENT_OCCURENCY);
+            ps.setString(1, vehicleRegNumber);
+            rs = ps.executeQuery();
+            rs.next();
+            if(rs.getInt(1) >= PREMIUM_CLIENT) res=true;
+            return res;
+        }catch (Exception ex){
+            logger.error("Error saving ticket info",ex);
+        }finally {
+            dataBaseConfig.closeResultSet(rs);
+            dataBaseConfig.closeConnection(con);
+        }
+        return res;
     }
 }

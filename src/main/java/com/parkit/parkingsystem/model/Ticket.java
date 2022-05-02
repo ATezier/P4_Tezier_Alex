@@ -1,5 +1,7 @@
 package com.parkit.parkingsystem.model;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -57,5 +59,12 @@ public class Ticket {
 
     public void setOutTime(Date outTime) {
         this.outTime = outTime;
+    }
+
+    public void truncatePrice(){
+        System.out.println("not truncated : "+price);
+        Double truncatedDouble = BigDecimal.valueOf(price).setScale(3, RoundingMode.HALF_UP).doubleValue();
+        price =truncatedDouble;
+        System.out.println("truncated : "+price);
     }
 }
