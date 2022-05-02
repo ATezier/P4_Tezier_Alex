@@ -91,32 +91,6 @@ public class TicketDAO {
         return false;
     }
 
-    public boolean applyDiscount(Ticket ticket) {
-        Connection con = null;
-        ResultSet rs = null;
-        boolean res = false;
-        try {
-            con = dataBaseConfig.getConnection();
-            PreparedStatement ps = con.prepareStatement(DBConstants.CLIENT_OCCURENCY);
-            ps.setString(1, ticket.getVehicleRegNumber());
-            rs = ps.executeQuery();
-            rs.next();
-            if(rs.getInt(1) >= PREMIUM_CLIENT){
-                double price=ticket.getPrice();
-                price*=DISCOUNT;
-                ticket.setPrice(price);
-                res=true;
-            }
-            return res;
-        }catch (Exception ex){
-            logger.error("Error saving ticket info",ex);
-        }finally {
-            dataBaseConfig.closeResultSet(rs);
-            dataBaseConfig.closeConnection(con);
-        }
-        return res;
-    }
-
     public boolean checkDiscount(String vehicleRegNumber) {
         Connection con = null;
         ResultSet rs = null;
@@ -134,6 +108,16 @@ public class TicketDAO {
         }finally {
             dataBaseConfig.closeResultSet(rs);
             dataBaseConfig.closeConnection(con);
+        }
+        return res;
+    }
+    
+    public boolean applyDiscount(Ticket ticket) {
+        boolean res = this.checkDiscount(ticket.getVehicleRegNumber());
+        if(res){
+            double price=ticket.getPrice();
+            price*=DISCOUNT;
+            ticket.setPrice(price);
         }
         return res;
     }
