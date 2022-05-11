@@ -152,7 +152,6 @@ public class ParkingDataBaseIT {
         ticket.truncatePrice();
         System.out.println("Manual Print"+inTime);
         assertEquals(dbPrice, ticket.getPrice());
-        //TODO: check that the fare generated and out time are populated correctly in the database
     }
 
 }

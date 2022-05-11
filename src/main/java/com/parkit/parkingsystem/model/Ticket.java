@@ -2,7 +2,6 @@ package com.parkit.parkingsystem.model;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Calendar;
 import java.util.Date;
 
 public class Ticket {
@@ -18,6 +17,7 @@ public class Ticket {
     }
 
     public void setId(int id) {
+        if(id<1)throw new IllegalArgumentException("An ID must be greater than 0");
         this.id = id;
     }
 
@@ -42,6 +42,7 @@ public class Ticket {
     }
 
     public void setPrice(double price) {
+        if(price<0.0)throw new IllegalArgumentException("The price must be positive");
         this.price = price;
     }
 
