@@ -16,6 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Date;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -58,4 +59,29 @@ public class ParkingServiceTest {
         verify(parkingSpotDAO, Mockito.times(1)).updateParking(any(ParkingSpot.class));
     }
 
+    @Test
+    public void nullRegistrationNumberTest() throws Exception {
+        when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn(null);
+
+        try{
+            parkingService.processExitingVehicle();
+        } catch(IllegalArgumentException e) {
+            assertEquals("ERROR ParkingService - Unable to process exiting vehicle", e.getMessage());
+        }
+    }
+
+    @Test
+    public void getNextParkingNumberTest() throws Exception {
+        when(parkingSpotDAO.getNextAvailableSlot(any(ParkingType.class))).thenReturn(0);
+        when(inputReaderUtil.readSelection()).thenReturn(1);
+
+        try{
+            parkingService.getNextParkingNumberIfAvailable();
+        } catch(Exception e) {
+            assertEquals("Error fetching parking number from DB. Parking slots might be full", e.getMessage());
+        }
+    }
 }
+
+
+

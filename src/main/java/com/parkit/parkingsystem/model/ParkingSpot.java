@@ -9,7 +9,6 @@ public class ParkingSpot {
 
     public ParkingSpot(int number, ParkingType parkingType, boolean isAvailable) {
         if(number<1)throw new IllegalArgumentException("An ID must be greater than 0");
-        if(parkingType==null)throw new IllegalArgumentException("A parkingType is not null.");
         this.number = number;
         this.parkingType = parkingType;
         this.isAvailable = isAvailable;

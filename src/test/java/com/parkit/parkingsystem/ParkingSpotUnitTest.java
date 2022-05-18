@@ -29,17 +29,6 @@ public class ParkingSpotUnitTest {
     }
 
     @Test
-    public void callConstructorWithUnitialisedParkingType(){
-        ParkingSpot parkingSpotTemp;
-        try{
-            parkingSpotTemp = new ParkingSpot(1,null,true);
-            fail();
-        } catch(IllegalArgumentException e) {
-            assertEquals("A parkingType is not null.", e.getMessage());
-        }
-    }
-
-    @Test
     public void setWrongNumber(){
         try{
             parkingSpot.setId(-1);
