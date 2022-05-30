@@ -25,7 +25,7 @@ insert into parking(PARKING_NUMBER,AVAILABLE,TYPE) values(4,true,'BIKE');
 insert into parking(PARKING_NUMBER,AVAILABLE,TYPE) values(5,true,'BIKE');
 commit;
 
-/* Setting up TEST DB */
+/* Setting up testP4 DB */
 create database testP4;
 use testP4;
 

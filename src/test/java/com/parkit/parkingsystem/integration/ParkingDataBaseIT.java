@@ -69,13 +69,15 @@ public class ParkingDataBaseIT {
         Logger logger = LogManager.getLogger("TicketDAO");
         int parkingSlot=0;
         int available=1;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
 
         Connection con = null;
         try {
             con = dataBaseTestConfig.getConnection();
-            PreparedStatement ps = con.prepareStatement("select PARKING_NUMBER from ticket where VEHICLE_REG_NUMBER=? and OUT_TIME IS NULL");
+            ps = con.prepareStatement("select PARKING_NUMBER from ticket where VEHICLE_REG_NUMBER=? and OUT_TIME IS NULL");
             ps.setString(1,vehicleRegNumber);
-            ResultSet rs = ps.executeQuery();
+            rs = ps.executeQuery();
             if(rs.next()){
                 parkingSlot=rs.getInt(1);
             }
@@ -85,11 +87,11 @@ public class ParkingDataBaseIT {
             if(rs.next()){
                 available=rs.getInt(1);
             }
-            dataBaseTestConfig.closeResultSet(rs);
-            dataBaseTestConfig.closePreparedStatement(ps);
         }catch (Exception ex){
             logger.error("Error fetching next available slot",ex);
         }finally {
+            dataBaseTestConfig.closePreparedStatement(ps);
+            dataBaseTestConfig.closeResultSet(rs);
             dataBaseTestConfig.closeConnection(con);
         }
         assertEquals(available, 0);
@@ -106,18 +108,20 @@ public class ParkingDataBaseIT {
         double dbPrice=0;
         Connection con = null;
         Date inTime = new Date();
+        ResultSet rs = null;
+        PreparedStatement ps = null;
 
         inTime.setTime((long) (System.currentTimeMillis() - (  60 * 60 * 10000 * Math.random())));
         try {
             con = dataBaseTestConfig.getConnection();
-            PreparedStatement ps = con.prepareStatement("update ticket set IN_TIME=? where OUT_TIME is NULL and VEHICLE_REG_NUMBER=?");
+            ps = con.prepareStatement("update ticket set IN_TIME=? where OUT_TIME is NULL and VEHICLE_REG_NUMBER=?");
             ps.setTimestamp(1,new Timestamp(inTime.getTime()));
             ps.setString(2,vehicleRegNumber);
             ps.execute();
-            dataBaseTestConfig.closePreparedStatement(ps);
         }catch (Exception ex){
             logger.error("Error fetching next available slot",ex);
         }finally {
+            dataBaseTestConfig.closePreparedStatement(ps);
             dataBaseTestConfig.closeConnection(con);
         }
 
@@ -125,10 +129,10 @@ public class ParkingDataBaseIT {
 
         try {
             con = dataBaseTestConfig.getConnection();
-            PreparedStatement ps = con.prepareStatement("select t.PARKING_NUMBER, t.ID, t.PRICE, t.IN_TIME, t.OUT_TIME, p.TYPE from ticket t,parking p where p.parking_number = t.parking_number and t.VEHICLE_REG_NUMBER=? order by t.IN_TIME  limit 1");
+            ps = con.prepareStatement("select t.PARKING_NUMBER, t.ID, t.PRICE, t.IN_TIME, t.OUT_TIME, p.TYPE from ticket t,parking p where p.parking_number = t.parking_number and t.VEHICLE_REG_NUMBER=? order by t.IN_TIME  limit 1");
             //ID, PARKING_NUMBER, VEHICLE_REG_NUMBER, PRICE, IN_TIME, OUT_TIME)
             ps.setString(1,vehicleRegNumber);
-            ResultSet rs = ps.executeQuery();
+            rs = ps.executeQuery();
             if(rs.next()){
                 ticket=new Ticket();
                 ParkingSpot parkingSpot = new ParkingSpot(rs.getInt(1), ParkingType.valueOf(rs.getString(6)),false);
@@ -139,19 +143,22 @@ public class ParkingDataBaseIT {
                 ticket.setInTime(rs.getTimestamp(4));
                 ticket.setOutTime(rs.getTimestamp(5));
             }
-            dataBaseTestConfig.closeResultSet(rs);
-            dataBaseTestConfig.closePreparedStatement(ps);
         }catch (Exception ex){
             logger.error("Error fetching next available slot",ex);
         }finally {
+            dataBaseTestConfig.closeResultSet(rs);
+            dataBaseTestConfig.closePreparedStatement(ps);
             dataBaseTestConfig.closeConnection(con);
         }
-        dbPrice=ticket.getPrice();
-
-        calculator.calculateFare(ticket);
-        ticket.truncatePrice();
-        System.out.println("Manual Print"+inTime);
-        assertEquals(dbPrice, ticket.getPrice());
+        try{
+            dbPrice=ticket.getPrice();
+            calculator.calculateFare(ticket);
+            ticket.truncatePrice();
+            System.out.println("Manual Print"+inTime);
+            assertEquals(dbPrice, ticket.getPrice());
+        }catch (NullPointerException e){
+            logger.error(e.getMessage(),e);
+        }
     }
 
 }

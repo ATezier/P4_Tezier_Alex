@@ -2,11 +2,13 @@ package com.parkit.parkingsystem;
 
 import com.parkit.parkingsystem.constants.ParkingType;
 import com.parkit.parkingsystem.model.ParkingSpot;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
+
 
 public class ParkingSpotUnitTest {
 
@@ -17,9 +19,10 @@ public class ParkingSpotUnitTest {
         parkingSpot = new ParkingSpot(1, ParkingType.CAR,true);
     }
 
+    @SuppressFBWarnings("DLS_DEAD_LOCAL_STORE")
     @Test
     public void callConstructorWithInvalidId(){
-        ParkingSpot parkingSpotTemp;
+        ParkingSpot parkingSpotTemp = null;
         try{
             parkingSpotTemp = new ParkingSpot(-1,ParkingType.CAR,true);
             fail();
