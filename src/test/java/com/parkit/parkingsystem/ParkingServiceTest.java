@@ -19,6 +19,9 @@ import java.util.Date;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+/**
+ * The type Parking service test.
+ */
 @ExtendWith(MockitoExtension.class)
 public class ParkingServiceTest {
 
@@ -53,12 +56,20 @@ public class ParkingServiceTest {
         }
     }
 
+    /**
+     * Process exiting vehicle test.
+     */
     @Test
     public void processExitingVehicleTest(){
         parkingService.processExitingVehicle();
         verify(parkingSpotDAO, Mockito.times(1)).updateParking(any(ParkingSpot.class));
     }
 
+    /**
+     * Null registration number test.
+     *
+     * @throws Exception the exception
+     */
     @Test
     public void nullRegistrationNumberTest() throws Exception {
         when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn(null);
@@ -70,6 +81,11 @@ public class ParkingServiceTest {
         }
     }
 
+    /**
+     * Fail with invalid vehicle type.
+     *
+     * @throws Exception the exception
+     */
     @Test
     public void failWithInvalidVehicleType() throws Exception {
         when(parkingSpotDAO.getNextAvailableSlot(any(ParkingType.class))).thenReturn(0);

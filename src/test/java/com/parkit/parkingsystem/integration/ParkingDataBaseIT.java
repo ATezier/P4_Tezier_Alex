@@ -29,6 +29,9 @@ import java.util.Date;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
+/**
+ * The type Parking data base IT.
+ */
 @ExtendWith(MockitoExtension.class)
 public class ParkingDataBaseIT {
 
@@ -61,6 +64,9 @@ public class ParkingDataBaseIT {
 
     }
 
+    /**
+     * Test parking a car.
+     */
     @Test
     public void testParkingACar(){
         ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
@@ -97,6 +103,9 @@ public class ParkingDataBaseIT {
         assertEquals(available, 0);
     }
 
+    /**
+     * Test parking lot exit.
+     */
     @Test
     public void testParkingLotExit(){
         testParkingACar();

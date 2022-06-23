@@ -10,6 +10,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
 
+/**
+ * The type Parking spot unit test.
+ */
 public class ParkingSpotUnitTest {
 
     private ParkingSpot parkingSpot;
@@ -19,6 +22,9 @@ public class ParkingSpotUnitTest {
         parkingSpot = new ParkingSpot(1, ParkingType.CAR,true);
     }
 
+    /**
+     * Call constructor with invalid id.
+     */
     @SuppressFBWarnings("DLS_DEAD_LOCAL_STORE")
     @Test
     public void callConstructorWithInvalidId(){
@@ -31,6 +37,9 @@ public class ParkingSpotUnitTest {
         }
     }
 
+    /**
+     * Set wrong number.
+     */
     @Test
     public void setWrongNumber(){
         try{
@@ -41,6 +50,9 @@ public class ParkingSpotUnitTest {
         }
     }
 
+    /**
+     * Set uninitialised parking type.
+     */
     @Test
     public void setUninitialisedParkingType(){
         try{

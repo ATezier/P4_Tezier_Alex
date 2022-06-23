@@ -6,6 +6,9 @@ import org.apache.logging.log4j.Logger;
 
 import java.sql.*;
 
+/**
+ * The type Wrong data base test config.
+ */
 public class WrongDataBaseTestConfig extends DataBaseConfig {
 
     private static final Logger logger = LogManager.getLogger("WrongDataBaseTestConfig");

@@ -20,6 +20,9 @@ import java.util.Date;
 
 import static com.parkit.parkingsystem.constants.Fare.PREMIUM_CLIENT;
 
+/**
+ * The type Ticket dao test.
+ */
 @ExtendWith(MockitoExtension.class)
 public class TicketDaoTest {
 
@@ -39,30 +42,28 @@ public class TicketDaoTest {
         ticketDAO = new TicketDAO();
         ticketDAO.dataBaseConfig = dataBaseTestConfig;
         dataBasePrepareService = new DataBasePrepareService();
+    }
+
+    @BeforeEach
+    private void setUpPerTest() throws Exception {
         ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR,false);
         ticket = new Ticket();
         ticket.setInTime(new Date(System.currentTimeMillis()));
         ticket.setParkingSpot(parkingSpot);
         ticket.setVehicleRegNumber("ABCDEF");
         ticket.setPrice(20);
-    }
-
-    @BeforeEach
-    private void setUpPerTest() throws Exception {
         dataBasePrepareService.clearDataBaseEntries();
         ticketDAO.saveTicket(ticket);
     }
 
-    @Test
-    public void testSaveTicket() {
-        Assert.assertNotNull(ticketDAO.getTicket("ABCDEF"));
-    }
+
 
     @Test
     public void testUpdateTicket() {
         ticket.setOutTime(new Date(System.currentTimeMillis()));
         Assert.assertEquals(true, ticketDAO.updateTicket(ticket));
     }
+
 
     @Test
     public void testCheckDiscount(){
@@ -78,4 +79,11 @@ public class TicketDaoTest {
         ticketDAO.applyDiscount(ticket);
         Assert.assertEquals(false, (oldPrice == ticket.getPrice()));
     }
+
+
+    @Test
+    public void testSaveTicket() {
+        Assert.assertNotNull(ticketDAO.getTicket("ABCDEF"));
+    }
+
 }

@@ -5,10 +5,19 @@ import com.parkit.parkingsystem.integration.config.DataBaseTestConfig;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 
+/**
+ * The type Data base prepare service.
+ */
 public class DataBasePrepareService {
 
+    /**
+     * The Data base test config.
+     */
     DataBaseTestConfig dataBaseTestConfig = new DataBaseTestConfig();
 
+    /**
+     * Clear data base entries.
+     */
     public void clearDataBaseEntries(){
         Connection connection = null;
         PreparedStatement ps = null;

@@ -3,8 +3,16 @@ package com.parkit.parkingsystem.service;
 import com.parkit.parkingsystem.constants.Fare;
 import com.parkit.parkingsystem.model.Ticket;
 
+/**
+ * The type Fare calculator service.
+ */
 public class FareCalculatorService {
 
+    /**
+     * Calculate fare.
+     *
+     * @param ticket the ticket
+     */
     public void calculateFare(Ticket ticket) {
         if (ticket == null)throw new NullPointerException("ticket shouldn't be null");
         if ((ticket.getOutTime() == null) || (ticket.getOutTime().before(ticket.getInTime()))) {

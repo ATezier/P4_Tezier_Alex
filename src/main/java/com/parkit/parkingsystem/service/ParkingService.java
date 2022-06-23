@@ -11,6 +11,9 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.Date;
 
+/**
+ * The type Parking service.
+ */
 public class ParkingService {
 
     private static final Logger logger = LogManager.getLogger("ParkingService");
@@ -21,12 +24,22 @@ public class ParkingService {
     private ParkingSpotDAO parkingSpotDAO;
     private  TicketDAO ticketDAO;
 
+    /**
+     * Instantiates a new Parking service.
+     *
+     * @param inputReaderUtil the input reader util
+     * @param parkingSpotDAO  the parking spot dao
+     * @param ticketDAO       the ticket dao
+     */
     public ParkingService(InputReaderUtil inputReaderUtil, ParkingSpotDAO parkingSpotDAO, TicketDAO ticketDAO) {
         this.inputReaderUtil = inputReaderUtil;
         this.parkingSpotDAO = parkingSpotDAO;
         this.ticketDAO = ticketDAO;
     }
 
+    /**
+     * Process incoming vehicle.
+     */
     public void processIncomingVehicle() {
         try {
             ParkingSpot parkingSpot = getNextParkingNumberIfAvailable();
@@ -60,6 +73,12 @@ public class ParkingService {
         return inputReaderUtil.readVehicleRegistrationNumber();
     }
 
+    /**
+     * Gets next parking number if available.
+     *
+     * @return the next parking number if available
+     * @throws Exception the exception
+     */
     public ParkingSpot getNextParkingNumberIfAvailable() throws Exception {
 
         int parkingNumber = 0;
@@ -100,6 +119,9 @@ public class ParkingService {
         }
     }
 
+    /**
+     * Process exiting vehicle.
+     */
     public void processExitingVehicle() {
         try {
             String vehicleRegNumber = getVehichleRegNumber();

@@ -7,6 +7,9 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
+/**
+ * The type Ticket unit test.
+ */
 public class TicketUnitTest {
 
     private Ticket ticket;
@@ -16,6 +19,9 @@ public class TicketUnitTest {
         ticket = new Ticket();
     }
 
+    /**
+     * Set wrong id.
+     */
     @Test
     public void setWrongId(){
         try{
@@ -26,6 +32,9 @@ public class TicketUnitTest {
         }
     }
 
+    /**
+     * Set negative price.
+     */
     @Test
     public void setNegativePrice(){
         try{

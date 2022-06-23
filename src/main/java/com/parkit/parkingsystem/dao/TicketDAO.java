@@ -16,12 +16,24 @@ import java.sql.Timestamp;
 import static com.parkit.parkingsystem.constants.Fare.DISCOUNT;
 import static com.parkit.parkingsystem.constants.Fare.PREMIUM_CLIENT;
 
+/**
+ * The type Ticket dao.
+ */
 public class TicketDAO {
 
     private static final Logger logger = LogManager.getLogger("TicketDAO");
 
+    /**
+     * The Data base config.
+     */
     public DataBaseConfig dataBaseConfig = new DataBaseConfig();
 
+    /**
+     * Save ticket boolean.
+     *
+     * @param ticket the ticket
+     * @return the boolean
+     */
     public boolean saveTicket(Ticket ticket) {
         Connection con = null;
         PreparedStatement ps = null;
@@ -47,6 +59,12 @@ public class TicketDAO {
         }
     }
 
+    /**
+     * Gets ticket.
+     *
+     * @param vehicleRegNumber the vehicle reg number
+     * @return the ticket
+     */
     public Ticket getTicket(String vehicleRegNumber) {
         Connection con = null;
         Ticket ticket = null;
@@ -78,6 +96,12 @@ public class TicketDAO {
         }
     }
 
+    /**
+     * Update ticket boolean.
+     *
+     * @param ticket the ticket
+     * @return the boolean
+     */
     public boolean updateTicket(Ticket ticket) {
         Connection con = null;
         PreparedStatement ps = null;
@@ -98,6 +122,12 @@ public class TicketDAO {
         return false;
     }
 
+    /**
+     * Check discount boolean.
+     *
+     * @param vehicleRegNumber the vehicle reg number
+     * @return the boolean
+     */
     public boolean checkDiscount(String vehicleRegNumber) {
         Connection con = null;
         ResultSet rs = null;
@@ -121,6 +151,12 @@ public class TicketDAO {
         return res;
     }
 
+    /**
+     * Apply discount boolean.
+     *
+     * @param ticket the ticket
+     * @return the boolean
+     */
     public boolean applyDiscount(Ticket ticket) {
         boolean res = this.checkDiscount(ticket.getVehicleRegNumber());
         if (res) {

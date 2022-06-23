@@ -5,10 +5,20 @@ import org.apache.logging.log4j.Logger;
 
 import java.sql.*;
 
+/**
+ * The type Data base config.
+ */
 public class DataBaseConfig {
 
     private static final Logger logger = LogManager.getLogger("DataBaseConfig");
 
+    /**
+     * Gets connection.
+     *
+     * @return the connection
+     * @throws ClassNotFoundException the class not found exception
+     * @throws SQLException           the sql exception
+     */
     public Connection getConnection() throws ClassNotFoundException, SQLException {
         logger.info("Create DB connection");
         Class.forName("com.mysql.cj.jdbc.Driver");
@@ -16,6 +26,11 @@ public class DataBaseConfig {
                 "jdbc:mysql://localhost:3306/prod", "root", "rootroot");
     }
 
+    /**
+     * Close connection.
+     *
+     * @param con the con
+     */
     public void closeConnection(Connection con) {
         if (con != null) {
             try {
@@ -27,6 +42,11 @@ public class DataBaseConfig {
         }
     }
 
+    /**
+     * Close prepared statement.
+     *
+     * @param ps the ps
+     */
     public void closePreparedStatement(PreparedStatement ps) {
         if (ps != null) {
             try {
@@ -38,6 +58,11 @@ public class DataBaseConfig {
         }
     }
 
+    /**
+     * Close result set.
+     *
+     * @param rs the rs
+     */
     public void closeResultSet(final ResultSet rs) {
         if (rs != null) {
             try {

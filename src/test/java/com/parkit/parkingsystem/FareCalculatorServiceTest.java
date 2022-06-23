@@ -9,10 +9,14 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import java.util.Date;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+/**
+ * The type Fare calculator service test.
+ */
 public class FareCalculatorServiceTest {
 
     private static FareCalculatorService fareCalculatorService;
@@ -28,6 +32,9 @@ public class FareCalculatorServiceTest {
         ticket = new Ticket();
     }
 
+    /**
+     * Calculate fare car.
+     */
     @Test
     public void calculateFareCar(){
         Date inTime = new Date();
@@ -42,6 +49,9 @@ public class FareCalculatorServiceTest {
         assertEquals(ticket.getPrice(), Fare.CAR_RATE_PER_HOUR);
     }
 
+    /**
+     * Calculate fare bike.
+     */
     @Test
     public void calculateFareBike(){
         Date inTime = new Date();
@@ -56,6 +66,9 @@ public class FareCalculatorServiceTest {
         assertEquals(ticket.getPrice(), Fare.BIKE_RATE_PER_HOUR);
     }
 
+    /**
+     * Calculate fare unkown type.
+     */
     @Test
     public void calculateFareUnkownType(){
         Date inTime = new Date();
@@ -69,6 +82,9 @@ public class FareCalculatorServiceTest {
         assertThrows(NullPointerException.class, () -> fareCalculatorService.calculateFare(ticket));
     }
 
+    /**
+     * Calculate fare bike with future in time.
+     */
     @Test
     public void calculateFareBikeWithFutureInTime(){
         Date inTime = new Date();
@@ -82,6 +98,9 @@ public class FareCalculatorServiceTest {
         assertThrows(IllegalArgumentException.class, () -> fareCalculatorService.calculateFare(ticket));
     }
 
+    /**
+     * Calculate fare bike with less than one hour parking time.
+     */
     @Test
     public void calculateFareBikeWithLessThanOneHourParkingTime(){
         Date inTime = new Date();
@@ -96,6 +115,9 @@ public class FareCalculatorServiceTest {
         assertEquals((0.75 * Fare.BIKE_RATE_PER_HOUR), ticket.getPrice() );
     }
 
+    /**
+     * Calculate fare car with less than one hour parking time.
+     */
     @Test
     public void calculateFareCarWithLessThanOneHourParkingTime(){
         Date inTime = new Date();
@@ -110,6 +132,9 @@ public class FareCalculatorServiceTest {
         assertEquals( (0.75 * Fare.CAR_RATE_PER_HOUR) , ticket.getPrice());
     }
 
+    /**
+     * Calculate fare car with more than a day parking time.
+     */
     @Test
     public void calculateFareCarWithMoreThanADayParkingTime(){
         Date inTime = new Date();
