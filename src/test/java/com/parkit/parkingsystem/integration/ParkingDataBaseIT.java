@@ -4,6 +4,7 @@ import com.parkit.parkingsystem.constants.ParkingType;
 import com.parkit.parkingsystem.dao.ParkingSpotDAO;
 import com.parkit.parkingsystem.dao.TicketDAO;
 import com.parkit.parkingsystem.integration.config.DataBaseTestConfig;
+import com.parkit.parkingsystem.integration.dao.CustomRequestDAO;
 import com.parkit.parkingsystem.integration.service.DataBasePrepareService;
 import com.parkit.parkingsystem.model.ParkingSpot;
 import com.parkit.parkingsystem.model.Ticket;
@@ -20,10 +21,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.Timestamp;
 import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -39,6 +36,8 @@ public class ParkingDataBaseIT {
     private static ParkingSpotDAO parkingSpotDAO;
     private static TicketDAO ticketDAO;
     private static DataBasePrepareService dataBasePrepareService;
+    private static CustomRequestDAO customRequestDAO;
+    private static String vehicleRegNumber = "ABCDEF";
 
     @Mock
     private static InputReaderUtil inputReaderUtil;
@@ -50,12 +49,13 @@ public class ParkingDataBaseIT {
         ticketDAO = new TicketDAO();
         ticketDAO.dataBaseConfig = dataBaseTestConfig;
         dataBasePrepareService = new DataBasePrepareService();
+        customRequestDAO = new CustomRequestDAO();
     }
 
     @BeforeEach
     private void setUpPerTest() throws Exception {
         when(inputReaderUtil.readSelection()).thenReturn(1);
-        when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("ABCDEF");
+        when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn(vehicleRegNumber);
         dataBasePrepareService.clearDataBaseEntries();
     }
 
@@ -71,36 +71,8 @@ public class ParkingDataBaseIT {
     public void testParkingACar(){
         ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
         parkingService.processIncomingVehicle();
-        String vehicleRegNumber="ABCDEF";
-        Logger logger = LogManager.getLogger("TicketDAO");
-        int parkingSlot=0;
-        int available=1;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-
-        Connection con = null;
-        try {
-            con = dataBaseTestConfig.getConnection();
-            ps = con.prepareStatement("select PARKING_NUMBER from ticket where VEHICLE_REG_NUMBER=? and OUT_TIME IS NULL");
-            ps.setString(1,vehicleRegNumber);
-            rs = ps.executeQuery();
-            if(rs.next()){
-                parkingSlot=rs.getInt(1);
-            }
-            ps = con.prepareStatement("select AVAILABLE from parking where PARKING_NUMBER=?");
-            ps.setInt(1,parkingSlot);
-            rs = ps.executeQuery();
-            if(rs.next()){
-                available=rs.getInt(1);
-            }
-        }catch (Exception ex){
-            logger.error("Error fetching next available slot",ex);
-        }finally {
-            dataBaseTestConfig.closePreparedStatement(ps);
-            dataBaseTestConfig.closeResultSet(rs);
-            dataBaseTestConfig.closeConnection(con);
-        }
-        assertEquals(available, 0);
+        Integer available = customRequestDAO.getAvalabilityByVehicleRegNumber(vehicleRegNumber);
+        assertEquals(available.longValue(), 0);
     }
 
     /**
@@ -110,63 +82,23 @@ public class ParkingDataBaseIT {
     public void testParkingLotExit(){
         testParkingACar();
         ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
-        String vehicleRegNumber="ABCDEF";
-        Logger logger = LogManager.getLogger("TicketDAO");
-        Ticket ticket=null;
-        FareCalculatorService calculator=new FareCalculatorService();
-        double dbPrice=0;
-        Connection con = null;
+        Ticket ticket = null;
+        FareCalculatorService calculator = null;
+        double dbPrice = 0;
         Date inTime = new Date();
-        ResultSet rs = null;
-        PreparedStatement ps = null;
 
         inTime.setTime((long) (System.currentTimeMillis() - (  60 * 60 * 10000 * Math.random())));
-        try {
-            con = dataBaseTestConfig.getConnection();
-            ps = con.prepareStatement("update ticket set IN_TIME=? where OUT_TIME is NULL and VEHICLE_REG_NUMBER=?");
-            ps.setTimestamp(1,new Timestamp(inTime.getTime()));
-            ps.setString(2,vehicleRegNumber);
-            ps.execute();
-        }catch (Exception ex){
-            logger.error("Error fetching next available slot",ex);
-        }finally {
-            dataBaseTestConfig.closePreparedStatement(ps);
-            dataBaseTestConfig.closeConnection(con);
-        }
-
+        customRequestDAO.updateTicketInTimeValueFromVehicleRegNumber(vehicleRegNumber, inTime);
         parkingService.processExitingVehicle();
-
-        try {
-            con = dataBaseTestConfig.getConnection();
-            ps = con.prepareStatement("select t.PARKING_NUMBER, t.ID, t.PRICE, t.IN_TIME, t.OUT_TIME, p.TYPE from ticket t,parking p where p.parking_number = t.parking_number and t.VEHICLE_REG_NUMBER=? order by t.IN_TIME  limit 1");
-            //ID, PARKING_NUMBER, VEHICLE_REG_NUMBER, PRICE, IN_TIME, OUT_TIME)
-            ps.setString(1,vehicleRegNumber);
-            rs = ps.executeQuery();
-            if(rs.next()){
-                ticket=new Ticket();
-                ParkingSpot parkingSpot = new ParkingSpot(rs.getInt(1), ParkingType.valueOf(rs.getString(6)),false);
-                ticket.setParkingSpot(parkingSpot);
-                ticket.setId(rs.getInt(2));
-                ticket.setVehicleRegNumber(vehicleRegNumber);
-                ticket.setPrice(rs.getDouble(3));
-                ticket.setInTime(rs.getTimestamp(4));
-                ticket.setOutTime(rs.getTimestamp(5));
-            }
-        }catch (Exception ex){
-            logger.error("Error fetching next available slot",ex);
-        }finally {
-            dataBaseTestConfig.closeResultSet(rs);
-            dataBaseTestConfig.closePreparedStatement(ps);
-            dataBaseTestConfig.closeConnection(con);
-        }
+        ticket = customRequestDAO.getCurrentTicketByVehicleRegNumber(vehicleRegNumber);
         try{
-            dbPrice=ticket.getPrice();
+            calculator = new FareCalculatorService();
+            dbPrice = ticket.getPrice();
             calculator.calculateFare(ticket);
             ticket.truncatePrice();
-            System.out.println("Manual Print"+inTime);
             assertEquals(dbPrice, ticket.getPrice());
-        }catch (NullPointerException e){
-            logger.error(e.getMessage(),e);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
