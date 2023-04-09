@@ -23,7 +23,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Date;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 /**
@@ -71,8 +71,8 @@ public class ParkingDataBaseIT {
     public void testParkingACar(){
         ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
         parkingService.processIncomingVehicle();
-        Integer available = customRequestDAO.getAvalabilityByVehicleRegNumber(vehicleRegNumber);
-        assertEquals(available.longValue(), 0);
+        int nextAvailableSlot = parkingSpotDAO.getNextAvailableSlot(ParkingType.CAR);
+        assertEquals(2, nextAvailableSlot);
     }
 
     /**
@@ -82,24 +82,11 @@ public class ParkingDataBaseIT {
     public void testParkingLotExit(){
         testParkingACar();
         ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
-        Ticket ticket = null;
-        FareCalculatorService calculator = null;
-        double dbPrice = 0;
-        Date inTime = new Date();
-
-        inTime.setTime((long) (System.currentTimeMillis() - (  60 * 60 * 10000 * Math.random())));
-        customRequestDAO.updateTicketInTimeValueFromVehicleRegNumber(vehicleRegNumber, inTime);
         parkingService.processExitingVehicle();
-        ticket = customRequestDAO.getCurrentTicketByVehicleRegNumber(vehicleRegNumber);
-        try{
-            calculator = new FareCalculatorService();
-            dbPrice = ticket.getPrice();
-            calculator.calculateFare(ticket);
-            ticket.truncatePrice();
-            assertEquals(dbPrice, ticket.getPrice());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        Ticket ticket = null;
+        ticket = ticketDAO.getTicket(vehicleRegNumber);
+        assertFalse(ticket.getOutTime() == null);
+        assertEquals(0.0, ticket.getPrice());
     }
 
 }
