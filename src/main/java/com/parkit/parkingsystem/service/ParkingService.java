@@ -22,7 +22,7 @@ public class ParkingService {
 
     private InputReaderUtil inputReaderUtil;
     private ParkingSpotDAO parkingSpotDAO;
-    private  TicketDAO ticketDAO;
+    private TicketDAO ticketDAO;
 
     /**
      * Instantiates a new Parking service.
@@ -43,25 +43,24 @@ public class ParkingService {
     public void processIncomingVehicle() {
         try {
             ParkingSpot parkingSpot = getNextParkingNumberIfAvailable();
-            if (parkingSpot != null && parkingSpot.getId() > 0) {
+            if (parkingSpot != null) {
                 String vehicleRegNumber = getVehichleRegNumber();
                 parkingSpot.setAvailable(false);
                 parkingSpotDAO.updateParking(parkingSpot); //allot this parking space and mark it's availability as false
 
-                Date inTime = new Date();
                 Ticket ticket = new Ticket();
                 //ID, PARKING_NUMBER, VEHICLE_REG_NUMBER, PRICE, IN_TIME, OUT_TIME)
                 //ticket.setId(ticketID);
                 ticket.setParkingSpot(parkingSpot);
                 ticket.setVehicleRegNumber(vehicleRegNumber);
                 ticket.setPrice(0);
-                ticket.setInTime(inTime);
+                ticket.setInTime(new Date());
                 ticket.setOutTime(null);
                 ticketDAO.saveTicket(ticket);
                 if (ticketDAO.checkDiscount(vehicleRegNumber)) System.out.println("Welcome back! As a recurring user of our parking lot, you'll benefit from a 5% discount.");
                 System.out.println("Generated Ticket and saved in DB");
                 System.out.println("Please park your vehicle in spot number:" + parkingSpot.getId());
-                System.out.println("Recorded in-time for vehicle number:" + vehicleRegNumber + " is:" + inTime);
+                System.out.println("Recorded in-time for vehicle number:" + vehicleRegNumber + " is:" + ticket.getInTime());
             }
         } catch (Exception e) {
             logger.error("Unable to process incoming vehicle", e);

@@ -2,6 +2,7 @@ package com.parkit.parkingsystem.model;
 
 import com.parkit.parkingsystem.constants.ParkingType;
 
+
 /**
  * The type Parking spot.
  */

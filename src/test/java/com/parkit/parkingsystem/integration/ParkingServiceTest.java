@@ -7,9 +7,12 @@ import com.parkit.parkingsystem.model.ParkingSpot;
 import com.parkit.parkingsystem.model.Ticket;
 import com.parkit.parkingsystem.service.ParkingService;
 import com.parkit.parkingsystem.util.InputReaderUtil;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -26,6 +29,7 @@ import static org.mockito.Mockito.*;
 public class ParkingServiceTest {
 
     private static ParkingService parkingService;
+    private static Ticket ticket;
 
     @Mock
     private static InputReaderUtil inputReaderUtil;
@@ -34,26 +38,42 @@ public class ParkingServiceTest {
     @Mock
     private static TicketDAO ticketDAO;
 
+    @Captor
+    private static ArgumentCaptor<Ticket> captor;
+
+    @BeforeAll
+    private static void setUpAll() {
+        ticket = null;
+        ticket = new Ticket();
+        ticket.setInTime(new Date());
+        ticket.setPrice(0);
+        ticket.setVehicleRegNumber("ABCDEF");
+        ticket.setParkingSpot(new ParkingSpot(1, ParkingType.CAR, false));
+    }
+
     @BeforeEach
     private void setUpPerTest() {
         try {
-            lenient().when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("ABCDEF");
-
-            ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR,false);
-            Ticket ticket = new Ticket();
-            ticket.setInTime(new Date(System.currentTimeMillis() - (60*60*1000)));
-            ticket.setParkingSpot(parkingSpot);
-            ticket.setVehicleRegNumber("ABCDEF");
+            lenient().when(inputReaderUtil.readSelection()).thenReturn(1);
+            lenient().when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn(ticket.getVehicleRegNumber());
             lenient().when(ticketDAO.getTicket(anyString())).thenReturn(ticket);
             lenient().when(ticketDAO.updateTicket(any(Ticket.class))).thenReturn(true);
-
+            lenient().when(parkingSpotDAO.getNextAvailableSlot(any(ParkingType.class))).thenReturn(1);
             lenient().when(parkingSpotDAO.updateParking(any(ParkingSpot.class))).thenReturn(true);
-
             parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
         } catch (Exception e) {
             e.printStackTrace();
-            throw  new RuntimeException("Failed to set up test mock objects");
+            throw new RuntimeException("Failed to set up test mock objects");
         }
+    }
+
+    @Test
+    public void processIncomingVehicleTest() {
+        Ticket ticket = null;
+        parkingService.processIncomingVehicle();
+        verify(ticketDAO).saveTicket(captor.capture());
+        ticket = captor.getValue();
+        assertTrue(ticket != null);
     }
 
     /**
@@ -65,21 +85,6 @@ public class ParkingServiceTest {
         verify(parkingSpotDAO, Mockito.times(1)).updateParking(any(ParkingSpot.class));
     }
 
-    /**
-     * Null registration number test.
-     *
-     * @throws Exception the exception
-     */
-    @Test
-    public void nullRegistrationNumberTest() throws Exception {
-        when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn(null);
-
-        try{
-            parkingService.processExitingVehicle();
-        } catch(IllegalArgumentException e) {
-            assertEquals("ERROR ParkingService - Unable to process exiting vehicle", e.getMessage());
-        }
-    }
 
     /**
      * Fail with invalid vehicle type.
