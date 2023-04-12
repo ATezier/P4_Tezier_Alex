@@ -133,9 +133,10 @@
                 <version>0.8.5</version>
                 <configuration>
                     <excludes>
-                        <exclude>**/model.*</exclude>
-                        <exclude>**/config.*</exclude>
-                        <exclude>**/constants.*</exclude>
+                        <exclude>com/parkit/parkingsystem/model/*</exclude>
+                        <exclude>com/parkit/parkingsystem/util/*</exclude>
+                        <exclude>com/parkit/parkingsystem/constants/*</exclude>
+                        <exclude>com/parkit/parkingsystem/config/*</exclude>
                     </excludes>
                 </configuration>
                 <executions>
