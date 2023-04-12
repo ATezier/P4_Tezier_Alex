@@ -42,7 +42,6 @@ public class TicketDAOIT {
         ticketDAO = new TicketDAO();
         dataBasePrepareService = new DataBasePrepareService();
         ticketDAO.dataBaseConfig = dataBaseTestConfig;
-        dataBasePrepareService.clearDataBaseEntries();
     }
 
     @BeforeEach
@@ -52,6 +51,7 @@ public class TicketDAOIT {
         ticket.setParkingSpot(new ParkingSpot(1, ParkingType.CAR, false));
         ticket.setVehicleRegNumber("ABCDEF");
         ticket.setPrice(1.0);
+        dataBasePrepareService.clearDataBaseEntries();
     }
 
     @AfterAll

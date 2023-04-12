@@ -162,7 +162,7 @@ public class TicketDAO {
         boolean res = this.checkDiscount(ticket.getVehicleRegNumber());
         if (res) {
             double price = ticket.getPrice();
-            price *= DISCOUNT;
+            price = price * DISCOUNT;
             ticket.setPrice(price);
         }
         return res;
