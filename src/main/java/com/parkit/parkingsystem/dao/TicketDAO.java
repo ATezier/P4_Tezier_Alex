@@ -49,7 +49,8 @@ public class TicketDAO {
             ps.setTimestamp(4, new Timestamp(ticket.getInTime().getTime()));
             ps.setTimestamp(5, (ticket.getOutTime() == null) ? null : (new Timestamp(ticket.getOutTime().getTime())));
             ps.closeOnCompletion();
-            res = ps.execute();
+            ps.execute();
+            res = true;
         } catch (Exception ex) {
             logger.error("Error fetching next available slot", ex);
         } finally {
@@ -92,8 +93,8 @@ public class TicketDAO {
             dataBaseConfig.closeResultSet(rs);
             dataBaseConfig.closePreparedStatement(ps);
             dataBaseConfig.closeConnection(con);
-            return ticket;
         }
+        return ticket;
     }
 
     /**
