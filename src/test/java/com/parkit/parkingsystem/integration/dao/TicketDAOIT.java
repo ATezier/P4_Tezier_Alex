@@ -19,6 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Date;
 
+import static com.parkit.parkingsystem.constants.Fare.DISCOUNT;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
@@ -41,11 +42,11 @@ public class TicketDAOIT {
         ticketDAO = new TicketDAO();
         dataBasePrepareService = new DataBasePrepareService();
         ticketDAO.dataBaseConfig = dataBaseTestConfig;
+        dataBasePrepareService.clearDataBaseEntries();
     }
 
     @BeforeEach
     private void setUpPerTest() throws Exception {
-        dataBasePrepareService.clearDataBaseEntries();
         ticket = new Ticket();
         ticket.setInTime(new Date());
         ticket.setParkingSpot(new ParkingSpot(1, ParkingType.CAR, false));
@@ -55,7 +56,7 @@ public class TicketDAOIT {
 
     @AfterAll
     private static void tearDown(){
-
+        dataBasePrepareService.clearDataBaseEntries();
     }
 
 
@@ -109,11 +110,12 @@ public class TicketDAOIT {
      */
     @Test
     public void testApplyDiscount() {
+        ticketDAO.saveTicket(ticket);
+        ticketDAO.saveTicket(ticket);
+        ticketDAO.saveTicket(ticket);
         double oldPrice = ticket.getPrice();
-        ticket.setPrice(99);
         ticketDAO.applyDiscount(ticket);
-        assertFalse(ticket.getPrice() == oldPrice);
-        dataBasePrepareService.clearDataBaseEntries();
+        assertEquals(oldPrice*DISCOUNT, ticket.getPrice());
     }
 
 }
